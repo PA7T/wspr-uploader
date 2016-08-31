@@ -5,12 +5,29 @@ This module does prepare and upload the ALL_WSPR.TXT-format to the influxdb-serv
 Author : PA7T Clemens Heese clemens at pa7t.nl
          DK5HH Michael Hartje DK5HH at darc.de
 
+Parameters:
+ -fi inputfile (ALL_WSPR.TXT-format)
+ -fo <optinal> write a file in uploadformat to influxdb (see below)
+ -r  Callsign of reporter
+ -rl maidenhead locator of reporter
+ -u  influxdB user
+ -pw influxDB password
+ -host influxDB-Server name or IP
+ 
+The upload of the output file (-fo output.daten) could be done with
+  curl -X POST 'http://127.0.0.1:8086/write?db=wspr&precision=s' \
+  -u user:passwort --data-binary @output.daten
+
+Function:
+reading from -fi Infile preparing the ALL_WSPR.TXT-format for upload
+uploading with json-client to influxDB-Server -host 
+
 Installation:
 Prepare the python installation depending on what python version you are
 using (2/3)
 we need to add the modules in addition to a standeard python installation
 influxdb
-pyhamtools
+mlocs
 geohash
 You can install these modules with for pythoon 2 with
 pip2 install modulename
@@ -57,8 +74,8 @@ def wspr_to_file(in_str,wspr_reporter,wspr_loc_reporter, fout):
     wspr_date, wspr_time, wspr_other, wspr_snr, wspr_dt, wspr_freq, wspr_call, wspr_loc, wspr_pwr, wspr_drift, wspr_rest = in_str.split(
         ' ', 10)
 
-    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m')
-    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1)
+    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m')
+    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1, 50.2)
     wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05, 1))]
 
     wspr_tuple_time = strptime(wspr_date + wspr_time, "%y%m%d%H%M")
@@ -118,8 +135,8 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
 
     wspr_date, wspr_time, wspr_other, wspr_snr, wspr_dt, wspr_freq, wspr_call, wspr_loc, wspr_pwr, wspr_drift, wspr_rest = in_str.split(' ', 10)
 
-    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m')
-    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1)
+    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', ' 6m')
+    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1, 50.2)
     wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05, 1))]
 
     wspr_tuple_time = strptime(wspr_date + wspr_time, "%y%m%d%H%M")
@@ -171,13 +188,13 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
             },
             "time": wspr_time,
             "fields": {
-                "snr": int(float(wspr_snr)),
-                "freq": float(wspr_freq),
-                "drift": int(float(wspr_drift)),
+                "snr": int(str(wspr_snr)),
+                "freq": "%.6f" % float(wspr_freq),
+                "drift": int(str(wspr_drift)),
                 "dist": wspr_dist,
                 "az": wspr_az,
                 "bandi": wspr_band,
-                "pwr": int(float(wspr_pwr))
+                "pwr": int(str(wspr_pwr))
             }
         }
     ]
@@ -208,13 +225,36 @@ if __name__ == '__main__':  # noqa
         '-r', '--reporter',
         type=str,
         help="Reporter call sign",
-        default='PA7T')
+        default='PA7T',
+        required=True)
 
     parser.add_argument(
         '-rl', '--reporter-locator',
         type=str,
         help="Reporter locator",
-        default='JO22FD')
+        default='JO22FD',
+        required=True)
+    
+    parser.add_argument(
+        '-u', '--user',
+        type = str,
+        help = "Username for influxdB-server"
+        default='username',
+        required=True)
+
+    parser.add_argument(
+        '-pw', '--password',
+        type = str,
+        help = "password for influxDB-Server"
+        default='secret_password',
+        required=True)
+
+    parser.add_argument(
+        '-host',
+        type = str,
+        help = "influxdB-Server-name or IP"
+        default='thehost.home.net',
+        required=True)
 
     parser.add_argument('-fo',
         type=str,
@@ -222,6 +262,7 @@ if __name__ == '__main__':  # noqa
         default=False)
 
     args = parser.parse_args()
+
     # try to open input file
     try:
         f = open(args.fi, "r")
@@ -235,7 +276,7 @@ if __name__ == '__main__':  # noqa
                 fout = open(args.fo,'a')
                 print "Additional output to {}.\n".format(args.fo)
             # open connection to Influxdb
-            client = InfluxDBClient('thehost.home.net', 8087, 'user_name', 'secret_password', 'wspr')
+            client = InfluxDBClient(args.host, 8087, args.u, args.pw, 'wspr')
             # iterate over lines
             wspr_no = sum(1 for line in f)
             f.seek(0, 0)

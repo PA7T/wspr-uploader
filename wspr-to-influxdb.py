@@ -161,7 +161,7 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
         wspr_call = wspr_call[1:-1]
         if wspr_call.find('..') >= 0:
             wspr_call = "00" + wspr_loc
-
+    # clean up callsign string
     wspr_call = re.sub('[<>]', '', wspr_call)
 
     if wspr_call.find('..') >= 0:
@@ -238,21 +238,21 @@ if __name__ == '__main__':  # noqa
     parser.add_argument(
         '-u', '--user',
         type = str,
-        help = "Username for influxdB-server"
+        help = "Username for influxdB-server",
         default='username',
         required=True)
 
     parser.add_argument(
         '-pw', '--password',
         type = str,
-        help = "password for influxDB-Server"
+        help = "password for influxDB-Server",
         default='secret_password',
         required=True)
 
     parser.add_argument(
         '-host',
         type = str,
-        help = "influxdB-Server-name or IP"
+        help = "influxdB-Server-name or IP",
         default='thehost.home.net',
         required=True)
 

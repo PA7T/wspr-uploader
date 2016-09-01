@@ -161,7 +161,7 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
         wspr_call = wspr_call[1:-1]
         if wspr_call.find('..') >= 0:
             wspr_call = "00" + wspr_loc
-
+    # clean up callsign string
     wspr_call = re.sub('[<>]', '', wspr_call)
 
     if wspr_call.find('..') >= 0:

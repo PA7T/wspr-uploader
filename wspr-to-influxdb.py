@@ -213,14 +213,6 @@ if __name__ == '__main__':  # noqa
         description='Load ALL_WSPR.TXT like file to Influxdb',
         epilog="""... epilog ... no more info atm ...""")
 
-    group = parser.add_argument_group('files')
-
-    parser.add_argument(
-        '-fi',
-        type=str,
-        help="filename of ALL_WSPR.TXT-file",
-        default='ALL_WSPR.TXT')
-
     parser.add_argument(
         '-r', '--reporter',
         type=str,
@@ -229,7 +221,7 @@ if __name__ == '__main__':  # noqa
         required=True)
 
     parser.add_argument(
-        '-rl', '--reporter-locator',
+        '-rl', '--reporter_locator',
         type=str,
         help="Reporter locator",
         default='JO22FD',
@@ -250,11 +242,26 @@ if __name__ == '__main__':  # noqa
         required=True)
 
     parser.add_argument(
-        '-host',
+        '-H', '--host',
         type = str,
         help = "influxdB-Server-name or IP",
         default='thehost.home.net',
         required=True)
+
+    parser.add_argument(
+        '-p', '--port',
+        type = int,
+        help = "influxdB-Server port",
+        default= 8086,
+        required=True)
+
+    group = parser.add_argument_group('files')
+
+    parser.add_argument(
+        '-fi',
+        type=str,
+        help="filename of ALL_WSPR.TXT-file",
+        default='ALL_WSPR.TXT')
 
     parser.add_argument('-fo',
         type=str,
@@ -262,7 +269,6 @@ if __name__ == '__main__':  # noqa
         default=False)
 
     args = parser.parse_args()
-
     # try to open input file
     try:
         f = open(args.fi, "r")
@@ -276,13 +282,14 @@ if __name__ == '__main__':  # noqa
                 fout = open(args.fo,'a')
                 print "Additional output to {}.\n".format(args.fo)
             # open connection to Influxdb
-            client = InfluxDBClient(args.host, 8087, args.u, args.pw, 'wspr')
+            client = InfluxDBClient(args.host, args.port, args.user, 
+                                    args.password, 'wspr')
             # iterate over lines
             wspr_no = sum(1 for line in f)
             f.seek(0, 0)
-            i=0
+            i = 1
             for in_str in f:
-                print "{}/{}".format(i,wspr_no-1)
+#                print "{}/{}".format(i,wspr_no)
                 #print(in_str)
                 json_body = wspr_to_json(in_str,args.reporter,args.reporter_locator)
                 #print(json_body)
@@ -293,7 +300,7 @@ if __name__ == '__main__':  # noqa
                     # submit spot to Influxdb
                     ret = client.write_points(json_body)
                 i=i+1
-            print("\nDone.")
+            print("\n"+wspr_no+" Uploads to influxdB done.")
         finally:
             f.close()
             if args.fo:

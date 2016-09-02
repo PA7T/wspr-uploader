@@ -111,14 +111,22 @@ def wspr_to_file(in_str,wspr_reporter,wspr_loc_reporter, fout):
         wspr_dist, wspr_az = haversine(loclon_reporter[0], loclon_reporter[1], loclon[0], loclon[1])
         wspr_geohash = Geohash.encode(loclon[0], loclon[1], precision=7)
 
-    dat_str_local = 'wspr_redpitaya' + ',reporter=' + str(wspr_reporter) + \
-                    ',call=' + wspr_call + ',band=' + str(wspr_band).rjust(4, '.') + \
+    dat_str_local = 'wspr_redpitaya' + \
+                    ',reporter=' + str(wspr_reporter) + \
+                    ',call=' + wspr_call + \
+                    ',band=' + str(wspr_band).rjust(4, '.') + \
                     ',loc=' + wspr_loc + \
-                    ',geohash=' + str(wspr_geohash) + ',geohash_reporter=' + str(wspr_geohash_reporter) + \
-                    ' snr=' + str(wspr_snr) + ',freq=' + str(wspr_freq) + ',drift=' + str(wspr_dt) + \
-                    ',dist=' + str(wspr_dist) + ',az=' + str(wspr_az) + \
+                    ',loc_reporter=' + wspr_loc_reporter + \
+                    ',geohash=' + str(wspr_geohash) + \
+                    ',geohash_reporter=' + str(wspr_geohash_reporter) + \
+                    ' snr=' + str(wspr_snr) + \
+                    ',freq=' + str(wspr_freq) + \
+                    ',drift=' + str(wspr_dt) + \
+                    ',dist=' + str(wspr_dist) + \
+                    ',az=' + str(wspr_az) + \
                     ',bandi=' + str(wspr_band) + \
-                    ',pwr=' + str(wspr_pwr) + ' ' + str(wspr_time)
+                    ',pwr=' + str(wspr_pwr) + \
+                    ' ' + str(wspr_time)
 
 
     fout.write(dat_str_local + '\n')
@@ -300,7 +308,7 @@ if __name__ == '__main__':  # noqa
                     # submit spot to Influxdb
                     ret = client.write_points(json_body)
                 i=i+1
-            print( str(wspr_no) +" spot Uploads to influxdB done.")
+            print( str(wspr_no) + " spot Uploads to influxdB done.")
         finally:
             f.close()
             if args.fo:

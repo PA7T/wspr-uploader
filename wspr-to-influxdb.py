@@ -184,7 +184,7 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
 
     json_body = [
         {
-            "measurement": "wspr_redpitaya_test",
+            "measurement": "wspr_redpitaya",
             "tags": {
                 "reporter": wspr_reporter,
                 "call": wspr_call,

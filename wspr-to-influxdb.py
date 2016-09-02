@@ -276,7 +276,7 @@ if __name__ == '__main__':  # noqa
         print "Error: Cannot open file {} for reading!\n".format(args.fi)
         exit(1)
     else:
-        print "Processing file {} ...\n".format(args.fi)
+        print "Processing file {} ...".format(args.fi)
         try:
             if args.fo:
                 fout = open(args.fo,'a')
@@ -300,7 +300,7 @@ if __name__ == '__main__':  # noqa
                     # submit spot to Influxdb
                     ret = client.write_points(json_body)
                 i=i+1
-            print("\n" + str(wspr_no) +" Uploads to influxdB done.")
+            print( str(wspr_no) +" spot Uploads to influxdB done.")
         finally:
             f.close()
             if args.fo:

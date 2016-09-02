@@ -300,7 +300,7 @@ if __name__ == '__main__':  # noqa
                     # submit spot to Influxdb
                     ret = client.write_points(json_body)
                 i=i+1
-            print("\n"+wspr_no+" Uploads to influxdB done.")
+            print("\n" + str(wspr_no) +" Uploads to influxdB done.")
         finally:
             f.close()
             if args.fo:

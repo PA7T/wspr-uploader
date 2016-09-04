@@ -197,7 +197,7 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
             "time": wspr_time,
             "fields": {
                 "snr": int(str(wspr_snr)),
-                "freq": "%.6f" % float(wspr_freq),
+                "freq": float("%.6f" % float(wspr_freq)),  # limit freq to 6 digits, but keep it a float, no string!
                 "drift": int(str(wspr_drift)),
                 "dist": wspr_dist,
                 "az": wspr_az,

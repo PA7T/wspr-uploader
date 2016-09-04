@@ -71,12 +71,16 @@ def wspr_to_file(in_str,wspr_reporter,wspr_loc_reporter, fout):
     in_str = in_str.replace('   ', ' ')
     in_str = in_str.replace('  ', ' ')
 
-    wspr_date, wspr_time, wspr_other, wspr_snr, wspr_dt, wspr_freq, wspr_call, wspr_loc, wspr_pwr, wspr_drift, wspr_rest = in_str.split(
-        ' ', 10)
+    wspr_date, wspr_time, wspr_other, wspr_snr, wspr_dt, wspr_freq, wspr_call, \
+         wspr_loc, wspr_pwr, wspr_drift, wspr_rest = in_str.split(' ', 10)
 
-    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m')
-    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1, 50.2)
-    wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05, 1))]
+    band_vec = (2200,630,160,80,60,60,40,30,20,17,15,12,10,6)
+    freq_vec = (0.1,0.4,1.8,3.5,5.2,5.3,7.0,10.1,14.0,18.1,21.0,24.9,28.1,50.2)
+    wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05,1))]
+
+#    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m')
+#    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1, 50.2)
+#    wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05, 1))]
 
     wspr_tuple_time = strptime(wspr_date + wspr_time, "%y%m%d%H%M")
     wspr_time = strftime("%Y-%m-%dT%H:%M:%SZ", wspr_tuple_time)
@@ -120,8 +124,9 @@ def wspr_to_file(in_str,wspr_reporter,wspr_loc_reporter, fout):
                     ',geohash=' + str(wspr_geohash) + \
                     ',geohash_reporter=' + str(wspr_geohash_reporter) + \
                     ' snr=' + str(wspr_snr) + \
-                    ',freq=' + str(wspr_freq) + \
-                    ',drift=' + str(wspr_dt) + \
+                    ',freq=' + str("%.6f" % float(wspr_freq)) + \
+                    ',drift=' + str(int(wspr_drift)) + \
+                    ',dt=' + str("%.1f" % float(wspr_dt)) + \
                     ',dist=' + str(wspr_dist) + \
                     ',az=' + str(wspr_az) + \
                     ',bandi=' + str(wspr_band) + \
@@ -141,11 +146,16 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
     in_str = in_str.replace('   ', ' ')
     in_str = in_str.replace('  ', ' ')
 
-    wspr_date, wspr_time, wspr_other, wspr_snr, wspr_dt, wspr_freq, wspr_call, wspr_loc, wspr_pwr, wspr_drift, wspr_rest = in_str.split(' ', 10)
+    wspr_date, wspr_time, wspr_other, wspr_snr, wspr_dt, wspr_freq, wspr_call, \
+         wspr_loc, wspr_pwr, wspr_drift, wspr_rest = in_str.split(' ', 10)
 
-    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', ' 6m')
-    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1, 50.2)
-    wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05, 1))]
+    band_vec = (2200,630,160,80,60,60,40,30,20,17,15,12,10,6)
+    freq_vec = (0.1,0.4,1.8,3.5,5.2,5.3,7.0,10.1,14.0,18.1,21.0,24.9,28.1,50.2)
+    wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05,1))]
+
+#    band_vec = ('LF', 'MW', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m')
+#    freq_vec = (0.1, 0.4, 1.8, 3.5, 5.2, 7.0, 10.1, 14.0, 18.1, 21.0, 24.9, 28.1, 50.2)
+#    wspr_band = band_vec[freq_vec.index(round(float(wspr_freq) - 0.05, 1))]
 
     wspr_tuple_time = strptime(wspr_date + wspr_time, "%y%m%d%H%M")
     wspr_time = strftime("%Y-%m-%dT%H:%M:%SZ", wspr_tuple_time)
@@ -197,8 +207,10 @@ def wspr_to_json(in_str,wspr_reporter,wspr_loc_reporter):
             "time": wspr_time,
             "fields": {
                 "snr": int(str(wspr_snr)),
-                "freq": float("%.6f" % float(wspr_freq)),  # limit freq to 6 digits, but keep it a float, no string!
+                # limit freq to 6 digits, but keep it a float, no string!
+                "freq": float("%.6f" % float(wspr_freq)),  
                 "drift": int(str(wspr_drift)),
+                "dt": str("%.1f" % float(wspr_dt)),
                 "dist": wspr_dist,
                 "az": wspr_az,
                 "bandi": wspr_band,

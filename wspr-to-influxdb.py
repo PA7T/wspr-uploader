@@ -131,7 +131,7 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter):
             "time": wspr_time,
             # fields should be real(integer values -- not strings
             "fields": {
-                "snr": ("%ii" % wspr_snr),
+                "snr": ("%ii" % int(wspr_snr)),
                 # limit freq to 6 digits, but keep it a float, not a string!
                 "freq": ("%.6f" % float(wspr_freq)),  
                 "drift": ("%ii" % wspr_drift),

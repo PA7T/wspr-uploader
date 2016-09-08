@@ -134,12 +134,12 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter):
                 "snr": ("%ii" % int(wspr_snr)),
                 # limit freq to 6 digits, but keep it a float, not a string!
                 "freq": ("%.6f" % float(wspr_freq)),  
-                "drift": ("%ii" % wspr_drift),
+                "drift": ("%ii" % int(wspr_drift)),
                 "dt": ("%.1f" % float(wspr_dt)),
-                "dist": "%ii" % wspr_dist,
-                "az": "%ii" % wspr_az,
-                "bandi": "%ii" % wspr_band,
-                "pwr": "%ii" % wspr_pwr # dBm
+                "dist": "%ii" % int(wspr_dist),
+                "az": "%ii" % int(wspr_az),
+                "bandi": "%ii" % int(wspr_band),
+                "pwr": "%ii" % int(wspr_pwr) # dBm
             }
         }
     ]

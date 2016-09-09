@@ -131,15 +131,15 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter):
             "time": wspr_time,
             # fields should be real(integer values -- not strings
             "fields": {
-                "snr": ("%ii" % int(wspr_snr)),
+                "snr": int(wspr_snr),
                 # limit freq to 6 digits, but keep it a float, not a string!
-                "freq": ("%.6f" % float(wspr_freq)),  
-                "drift": ("%ii" % int(wspr_drift)),
-                "dt": ("%.1f" % float(wspr_dt)),
-                "dist": "%ii" % int(wspr_dist),
-                "az": "%ii" % int(wspr_az),
-                "bandi": "%ii" % int(wspr_band),
-                "pwr": "%ii" % int(wspr_pwr) # dBm
+                "freq": float("%.6f" % float(wspr_freq)),
+                "drift": int(wspr_drift),
+                "dt": float("%.1f" % float(wspr_dt)),
+                "dist": int(wspr_dist),
+                "az": int(wspr_az),
+                "bandi": int(wspr_band),
+                "pwr": int(wspr_pwr) # dBm
             }
         }
     ]

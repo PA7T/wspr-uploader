@@ -61,7 +61,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return int(km), int(Bearing)
 
 
-def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter):
+def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter,wspr_comment):
 
     # in_str = '160310 1942   1 -24 -4.0  7.0395714  PA2W JO22 37            1  6739  -48'
 
@@ -126,7 +126,8 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter):
                 "loc": wspr_loc,
                 "loc_reporter": wspr_loc_reporter,
                 "geohash": wspr_geohash,
-                "geohash_reporter": wspr_geohash_reporter
+                "geohash_reporter": wspr_geohash_reporter,
+		"comment": str(wspr_comment)
             },
             "time": wspr_time,
             # fields should be real(integer values -- not strings
@@ -152,6 +153,7 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter):
                     ',loc_reporter=' + wspr_loc_reporter + \
                     ',geohash=' + str(wspr_geohash) + \
                     ',geohash_reporter=' + str(wspr_geohash_reporter) + \
+                    ',comment=' + str(wspr_comment) + \
                     ' snr=' + str(wspr_snr) + 'i' +\
                     ',freq=' + str("%.6f" % float(wspr_freq)) + \
                     ',drift=' + str(int(wspr_drift)) + 'i' + \
@@ -190,6 +192,13 @@ if __name__ == '__main__':  # noqa
         help="Reporter locator",
         default='JO22FD',
         required=True)
+    
+    parser.add_argument(
+        '-rc', '--reporter_comment',
+        type=str,
+        help="Reporter comment on configuration i.e. 'ANT=windom, PREAMP=30dB'",
+        default='',
+        required=False)
     
     parser.add_argument(
         '-u', '--user',
@@ -256,7 +265,7 @@ if __name__ == '__main__':  # noqa
             for in_str in f:
 #                print "{}/{}".format(i,wspr_no)
                 #print(in_str)
-                json_body,dat_str = wspr_to_upload(in_str,args.reporter,args.reporter_locator)
+                json_body,dat_str = wspr_to_upload(in_str,args.reporter,args.reporter_locator,args.reporter_comment)
                 #print(json_body)
 
                 if args.fo:

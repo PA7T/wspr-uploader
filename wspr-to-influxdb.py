@@ -84,6 +84,7 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter,wspr_comment):
     wspr_tuple_time = strptime(wspr_date + wspr_time, "%y%m%d%H%M")
     wspr_time = strftime("%Y-%m-%dT%H:%M:%SZ", wspr_tuple_time)
 
+    print(wspr_loc_reporter)
     loclon_reporter = mlocs.toLoc(wspr_loc_reporter)
     wspr_geohash_reporter = Geohash.encode(loclon_reporter[0], loclon_reporter[1], precision=7)
 
@@ -246,14 +247,14 @@ if __name__ == '__main__':  # noqa
     try:
         f = open(args.fi, "r")
     except (IOError, OSError):
-        print "Error: Cannot open file {} for reading!\n".format(args.fi)
+        print("Error: Cannot open file {} for reading!\n".format(args.fi))
         exit(1)
     else:
-        print "Processing file {} ...".format(args.fi)
+        print("Processing file {} ...".format(args.fi))
         try:
             if args.fo:
                 fout = open(args.fo,'a')
-                print "output to {} ...".format(args.fo)
+                print("output to {} ...".format(args.fo))
             # open connection to Influxdb, fixed DB "wspr"
             else:
                 client = InfluxDBClient(args.host, args.port, args.user, 

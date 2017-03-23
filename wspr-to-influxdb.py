@@ -233,7 +233,7 @@ if __name__ == '__main__':  # noqa
     from math import radians, cos, sin, asin, sqrt, atan2, pi
     from influxdb import InfluxDBClient
     import argparse
-    import Geohash
+    import geohash as Geohash
 
     parser = argparse.ArgumentParser(
         description='Load ALL_WSPR.TXT like file to Influxdb (or prepare into -fo file)',

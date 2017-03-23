@@ -27,7 +27,6 @@ Prepare the python installation depending on what python version you are
 using (2/3)
 we need to add the modules in addition to a standeard python installation
 influxdb
-mlocs
 geohash
 You can install these modules with for pythoon 2 with
 pip2 install modulename
@@ -40,6 +39,68 @@ import modulename
 
 '''
 
+def locator_to_latlong (locator):
+    """converts Maidenhead locator in the corresponding WGS84 coordinates
+        Args:
+            locator (string): Locator, either 4 or 6 characters
+        Returns:
+            tuple (float, float): Latitude, Longitude
+        Raises:
+            ValueError: When called with wrong or invalid input arg
+            TypeError: When arg is not a string
+        Example:
+           The following example converts a Maidenhead locator into Latitude and Longitude
+           >>> from pyhamtools.locator import locator_to_latlong
+           >>> latitude, longitude = locator_to_latlong("JN48QM")
+           >>> print latitude, longitude
+           48.5208333333 9.375
+        Note:
+             Latitude (negative = West, positive = East)
+             Longitude (negative = South, positive = North)
+    """
+
+    locator = locator.upper()
+
+    if len(locator) == 5 or len(locator) < 4:
+        raise ValueError
+
+    if ord(locator[0]) > ord('R') or ord(locator[0]) < ord('A'):
+        raise ValueError
+
+    if ord(locator[1]) > ord('R') or ord(locator[1]) < ord('A'):
+        raise ValueError
+
+    if ord(locator[2]) > ord('9') or ord(locator[2]) < ord('0'):
+        raise ValueError
+
+    if ord(locator[3]) > ord('9') or ord(locator[3]) < ord('0'):
+        raise ValueError
+
+    if len(locator) == 6:
+        if ord(locator[4]) > ord('X') or ord(locator[4]) < ord('A'):
+            raise ValueError
+        if ord (locator[5]) > ord('X') or ord(locator[5]) < ord('A'):
+            raise ValueError
+
+    longitude = (ord(locator[0]) - ord('A')) * 20 - 180
+    latitude = (ord(locator[1]) - ord('A')) * 10 - 90
+    longitude += (ord(locator[2]) - ord('0')) * 2
+    latitude += (ord(locator[3]) - ord('0'))
+
+    if len(locator) == 6:
+        longitude += ((ord(locator[4])) - ord('A')) * (2 / 24)
+        latitude += ((ord(locator[5])) - ord('A')) * (1 / 24)
+
+        # move to center of subsquare
+        longitude += 1 / 24
+        latitude += 0.5 / 24
+
+    else:
+        # move to center of square
+        longitude += 1;
+        latitude += 0.5;
+
+    return latitude, longitude
 
 def haversine(lat1, lon1, lat2, lon2):
     """
@@ -84,8 +145,7 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter,wspr_comment):
     wspr_tuple_time = strptime(wspr_date + wspr_time, "%y%m%d%H%M")
     wspr_time = strftime("%Y-%m-%dT%H:%M:%SZ", wspr_tuple_time)
 
-    print(wspr_loc_reporter)
-    loclon_reporter = mlocs.toLoc(wspr_loc_reporter)
+    loclon_reporter = locator_to_latlong(wspr_loc_reporter)
     wspr_geohash_reporter = Geohash.encode(loclon_reporter[0], loclon_reporter[1], precision=7)
 
     calckm_az = False
@@ -111,7 +171,7 @@ def wspr_to_upload(in_str,wspr_reporter,wspr_loc_reporter,wspr_comment):
         wspr_call = "00" + wspr_loc
 
     if calckm_az:
-        loclon = mlocs.toLoc(wspr_loc)
+        loclon = locator_to_latlong(wspr_loc)
         wspr_dist, wspr_az = haversine(loclon_reporter[0], loclon_reporter[1], loclon[0], loclon[1])
         wspr_geohash = Geohash.encode(loclon[0], loclon[1], precision=7)
 
@@ -173,7 +233,6 @@ if __name__ == '__main__':  # noqa
     from math import radians, cos, sin, asin, sqrt, atan2, pi
     from influxdb import InfluxDBClient
     import argparse
-    import mlocs
     import Geohash
 
     parser = argparse.ArgumentParser(
